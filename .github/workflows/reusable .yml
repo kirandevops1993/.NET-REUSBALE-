@@ -48,12 +48,16 @@ jobs:
         with:
           dotnet-version: '9.0.201'
 
+      - name: Set Version and Env Variable
+        run: |
+          VERSION="${{ inputs.majorVersion }}.${{ inputs.minorVersion }}.${{ inputs.patchVersion }}"
+          echo "Generated Version: $VERSION"
+          echo "${{ inputs.versionEnvVar }}=$VERSION" >> $GITHUB_ENV
+
       - name: Run dotnet ${{ inputs.command }}
         run: |
           CMD="${{ inputs.command }}"
-
-          echo "Working Directory: ${{ inputs.workingDirectory }}"
-          echo "Custom Flag: ${{ inputs.custom }}"
+          VERSION="${{ env.${{ inputs.versionEnvVar }} }}"
 
           if [ "$CMD" = "restore" ]; then
             dotnet restore "${{ inputs.projects }}" \
@@ -77,6 +81,5 @@ jobs:
               --no-build="${{ inputs.nobuild }}" \
               --include-symbols="${{ inputs.includesymbols }}" \
               --include-source="${{ inputs.includesource }}" \
-              --property "${{ inputs.buildProperties }}" \
+              --property "Version=$VERSION;${{ inputs.buildProperties }};PublishPackageMetadata=${{ inputs.publishPackageMetadata }}" \
               --verbosity "${{ inputs.verbosityPack }}"
-          fi
