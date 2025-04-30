@@ -1,0 +1,83 @@
+name: Reusable Dotnet Workflow
+
+on:
+  workflow_call:
+    inputs:
+      command: { required: true }
+      projects: { required: false }
+      arguments: { required: false }
+      feedsToUse: { required: false }
+      nugetConfigPath: { required: false }
+      packagesToPack: { required: false }
+      configuration: { required: false }
+      nuGetFeedType: { required: false }
+      custom: { required: false }
+      restoreArguments: { required: false }
+      testRunTitle: { required: false }
+      modifyOutputPath: { required: false }
+      packDirectory: { required: false }
+      nobuild: { required: false }
+      includesymbols: { required: false }
+      includesource: { required: false }
+      requestTimeout: { required: false }
+      noCache: { required: false }
+      restoreDirectory: { required: false }
+      verbosityRestore: { required: false }
+      publishPackageMetadata: { required: false }
+      versioningScheme: { required: false }
+      versionEnvVar: { required: false }
+      majorVersion: { required: false }
+      minorVersion: { required: false }
+      patchVersion: { required: false }
+      buildProperties: { required: false }
+      verbosityPack: { required: false }
+      workingDirectory: { required: false }
+
+jobs:
+  dotnet:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.workingDirectory || '.' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.201'
+
+      - name: Run dotnet ${{ inputs.command }}
+        run: |
+          CMD="${{ inputs.command }}"
+
+          echo "Working Directory: ${{ inputs.workingDirectory }}"
+          echo "Custom Flag: ${{ inputs.custom }}"
+
+          if [ "$CMD" = "restore" ]; then
+            dotnet restore "${{ inputs.projects }}" \
+              --configfile "${{ inputs.nugetConfigPath }}" \
+              ${{ inputs.restoreArguments }} \
+              --no-cache="${{ inputs.noCache }}" \
+              --packages "${{ inputs.restoreDirectory }}" \
+              --verbosity "${{ inputs.verbosityRestore }}"
+
+          elif [ "$CMD" = "build" ]; then
+            dotnet build "${{ inputs.projects }}" ${{ inputs.arguments }}
+
+          elif [ "$CMD" = "test" ]; then
+            dotnet test "${{ inputs.projects }}" ${{ inputs.arguments }} \
+              --logger "trx;LogFileName=${{ inputs.testRunTitle }}.trx"
+
+          elif [ "$CMD" = "pack" ]; then
+            dotnet pack "${{ inputs.packagesToPack }}" \
+              --configuration "${{ inputs.configuration }}" \
+              --output "${{ inputs.packDirectory }}" \
+              --no-build="${{ inputs.nobuild }}" \
+              --include-symbols="${{ inputs.includesymbols }}" \
+              --include-source="${{ inputs.includesource }}" \
+              --property "${{ inputs.buildProperties }}" \
+              --verbosity "${{ inputs.verbosityPack }}"
+          fi
