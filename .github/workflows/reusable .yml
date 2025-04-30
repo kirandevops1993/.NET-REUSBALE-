@@ -6,7 +6,6 @@ on:
       command: { required: true }
       projects: { required: false }
       arguments: { required: false }
-      feedsToUse: { required: false }
       nugetConfigPath: { required: false }
       packagesToPack: { required: false }
       configuration: { required: false }
