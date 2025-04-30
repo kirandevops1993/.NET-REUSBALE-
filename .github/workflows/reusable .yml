@@ -48,38 +48,34 @@ jobs:
         with:
           dotnet-version: '9.0.201'
 
-      - name: Set Version and Env Variable
+      - name: Set version variable
         run: |
           VERSION="${{ inputs.majorVersion }}.${{ inputs.minorVersion }}.${{ inputs.patchVersion }}"
-          echo "Generated Version: $VERSION"
           echo "${{ inputs.versionEnvVar }}=$VERSION" >> $GITHUB_ENV
 
       - name: Run dotnet ${{ inputs.command }}
         run: |
-          CMD="${{ inputs.command }}"
-          VERSION="${{ env.${{ inputs.versionEnvVar }} }}"
-
-          if [ "$CMD" = "restore" ]; then
+          if [ "${{ inputs.command }}" = "restore" ]; then
             dotnet restore "${{ inputs.projects }}" \
               --configfile "${{ inputs.nugetConfigPath }}" \
               ${{ inputs.restoreArguments }} \
-              --no-cache="${{ inputs.noCache }}" \
+              --no-cache "${{ inputs.noCache }}" \
               --packages "${{ inputs.restoreDirectory }}" \
               --verbosity "${{ inputs.verbosityRestore }}"
 
-          elif [ "$CMD" = "build" ]; then
+          elif [ "${{ inputs.command }}" = "build" ]; then
             dotnet build "${{ inputs.projects }}" ${{ inputs.arguments }}
 
-          elif [ "$CMD" = "test" ]; then
+          elif [ "${{ inputs.command }}" = "test" ]; then
             dotnet test "${{ inputs.projects }}" ${{ inputs.arguments }} \
               --logger "trx;LogFileName=${{ inputs.testRunTitle }}.trx"
 
-          elif [ "$CMD" = "pack" ]; then
+          elif [ "${{ inputs.command }}" = "pack" ]; then
             dotnet pack "${{ inputs.packagesToPack }}" \
               --configuration "${{ inputs.configuration }}" \
               --output "${{ inputs.packDirectory }}" \
-              --no-build="${{ inputs.nobuild }}" \
-              --include-symbols="${{ inputs.includesymbols }}" \
-              --include-source="${{ inputs.includesource }}" \
-              --property "Version=$VERSION;${{ inputs.buildProperties }};PublishPackageMetadata=${{ inputs.publishPackageMetadata }}" \
+              --no-build "${{ inputs.nobuild }}" \
+              --include-symbols "${{ inputs.includesymbols }}" \
+              --include-source "${{ inputs.includesource }}" \
+              --property "Version=${{ env.${{ inputs.versionEnvVar }} }};PublishPackageMetadata=${{ inputs.publishPackageMetadata }};${{ inputs.buildProperties }}" \
               --verbosity "${{ inputs.verbosityPack }}"
