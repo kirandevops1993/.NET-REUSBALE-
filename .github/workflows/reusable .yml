@@ -4,33 +4,33 @@ on:
   workflow_call:
     inputs:
       command: { required: true }
-      projects: { required: false }
+      projects: { required: true }
       arguments: { required: false }
-      nugetConfigPath: { required: false }
-      packagesToPack: { required: false }
-      configuration: { required: false }
+      nugetConfigPath: { required: true }
+      packagesToPack: { required: true }
+      configuration: { required: true }
       nuGetFeedType: { required: false }
-      custom: { required: false }
-      restoreArguments: { required: false }
+      custom: { required: true }
+      restoreArguments: { required: true }
       testRunTitle: { required: false }
-      modifyOutputPath: { required: false }
-      packDirectory: { required: false }
-      nobuild: { required: false }
-      includesymbols: { required: false }
-      includesource: { required: false }
+      modifyOutputPath: { required: true }
+      packDirectory: { required: true }
+      nobuild: { required: true }
+      includesymbols: { required: true }
+      includesource: { required: true }
       requestTimeout: { required: false }
-      noCache: { required: false }
-      restoreDirectory: { required: false }
-      verbosityRestore: { required: false }
-      publishPackageMetadata: { required: false }
+      noCache: { required: true }
+      restoreDirectory: { required: true }
+      verbosityRestore: { required: true }
+      publishPackageMetadata: { required: true }
       versioningScheme: { required: false }
-      versionEnvVar: { required: false }
-      majorVersion: { required: false }
-      minorVersion: { required: false }
-      patchVersion: { required: false }
-      buildProperties: { required: false }
-      verbosityPack: { required: false }
-      workingDirectory: { required: false }
+      versionEnvVar: { required: true }
+      majorVersion: { required: true }
+      minorVersion: { required: true }
+      patchVersion: { required: true }
+      buildProperties: { required: true }
+      verbosityPack: { required: true }
+      workingDirectory: { required: true }
 
 jobs:
   dotnet:
